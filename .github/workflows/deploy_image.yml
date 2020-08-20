@@ -1,0 +1,56 @@
+name: CI
+on:
+  repository_dispatch:
+    types: [containerregistry-imagepushed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Check variables
+      env:
+        PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
+      run: |
+          echo "::set-env name=repo_name::${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ github.event.client_payload.data.target.repository }}"
+          echo "::set-env name=repo_version::${{ github.event.client_payload.data.target.tag }}"
+          echo "::set-env name=image_name::${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ github.event.client_payload.data.target.repository }}:${{ github.event.client_payload.data.target.tag }}"
+    - name: Check variables2
+      run: |
+        echo "${{ env.repo_name }}"
+        echo "${{ env.repo_version }}"
+        echo "${{ env.image_name }}"    
+          
+    - name: Set Context for Azure Kubernetes Cluster using azure/aks-set-context@v1 action
+      uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}' 
+        cluster-name: ${{ secrets.AKS }}
+        resource-group: ${{ secrets.RESOURCE_GROUP }}
+    
+    - uses: Azure/k8s-create-secret@v1
+      with:
+        container-registry-url: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io
+        container-registry-username: ${{ secrets.USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: demo-k8s-secret
+
+    - uses: azure/k8s-bake@v1
+      with:
+        renderEngine: 'helm2'
+        helmChart: './charts/'
+        overrideFiles: './charts/values.yaml'
+        overrides: |     
+          image.repository: ${{ env.repo_name }}
+          image.tag: ${{ env.repo_version }}
+        releaseName: test01
+      id: bake
+
+    - uses: Azure/k8s-deploy@v1
+      with:
+        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        images: |
+          ${{ env.image_name }}
+        imagepullsecrets: |
+          demo-k8s-secret
