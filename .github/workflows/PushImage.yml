@@ -18,17 +18,17 @@ jobs:
             #resource_group: ${{ secrets.RESOURCE_GROUP }}
             #pattoken: ${{secrets.PATTOKEN}}
                   
-        - name: 'Login via Azure CLI'
-          uses: azure/login@v1
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-        #- name: 'Build and push image'
-         # uses: azure/docker-login@v1
+        #- name: 'Login via Azure CLI'
+         # uses: azure/login@v1
           #with:
-           # login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io 
-            #username: ${{ secrets.USERNAME }}
-            #password: ${{ secrets.REGISTRY_PASSWORD }} 
+           # creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+        - name: 'Build and push image'
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io 
+            username: ${{ secrets.USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }} 
         - run: |
             docker pull houssemdocker/angular-app:latest
             docker tag houssemdocker/angular-app:latest ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app6:v1
