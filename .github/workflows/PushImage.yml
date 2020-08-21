@@ -31,5 +31,5 @@ jobs:
             #password: ${{ secrets.REGISTRY_PASSWORD }} 
         - run: |
             docker pull houssemdocker/angular-app:latest
-            docker tag houssemdocker/angular-app:latest ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app5:v1
-            docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app5:v1
+            docker tag houssemdocker/angular-app:latest ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app6:v1
+            docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app6:v1
