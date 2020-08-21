@@ -26,7 +26,7 @@ jobs:
       uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}' 
-        cluster-name: ${{ secrets.AKS }}
+        cluster-name: clust
         resource-group: ${{ secrets.RESOURCE_GROUP }}
     
     - uses: Azure/k8s-create-secret@v1
@@ -52,5 +52,5 @@ jobs:
         manifests: ${{ steps.bake.outputs.manifestsBundle }}
         images: |
           ${{ env.image_name }}
-        imagepullsecrets: |
-          demo-k8s-secret
+        #imagepullsecrets: |
+         # demo-k8s-secret
