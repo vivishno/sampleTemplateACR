@@ -18,18 +18,27 @@ jobs:
             #resource_group: ${{ secrets.RESOURCE_GROUP }}
             #pattoken: ${{secrets.PATTOKEN}}
                   
-        #- name: 'Login via Azure CLI'
-         # uses: azure/login@v1
-          #with:
-           # creds: ${{ secrets.AZURE_CREDENTIALS }}
+        - name: 'Login via Azure CLI'
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+        - name: deploy ML workspace
+          uses: azure/CLI@v1 
+          with:
+             azcliversion: 2.9.1
+             inlineScript: |
+                az deployment group create --resource-group vivektest2 --template-file .cloud/.azure/deploy.json \
+                --parameters .cloud/.azure/deploy.params.json patToken=${{secrets.PATTOKEN}} containerRegistryName=myacrevivek1 repo_name=$GITHUB_REPOSITORY
         
         - name: 'Build and push image'
           uses: azure/docker-login@v1
           with:
-            login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io 
+            login-server: myacrevivek1.azurecr.io 
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }} 
         - run: |
             docker pull houssemdocker/angular-app:latest
-            docker tag houssemdocker/angular-app:latest ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app6:v1
-            docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/my-app6:v1
+            docker tag houssemdocker/angular-app:latest myacrevivek1.azurecr.io/my-app6:v1
+            docker push myacrevivek1.azurecr.io/my-app6:v1
