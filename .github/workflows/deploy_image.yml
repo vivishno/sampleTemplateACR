@@ -13,9 +13,9 @@ jobs:
       env:
         PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
       run: |
-          echo "::set-env name=repo_name::${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ github.event.client_payload.data.target.repository }}"
+          echo "::set-env name=repo_name::myacrevivek1.azurecr.io/${{ github.event.client_payload.data.target.repository }}"
           echo "::set-env name=repo_version::${{ github.event.client_payload.data.target.tag }}"
-          echo "::set-env name=image_name::${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ github.event.client_payload.data.target.repository }}:${{ github.event.client_payload.data.target.tag }}"
+          echo "::set-env name=image_name::myacrevivek1.azurecr.io/${{ github.event.client_payload.data.target.repository }}:${{ github.event.client_payload.data.target.tag }}"
     - name: Check variables2
       run: |
         echo "${{ env.repo_name }}"
@@ -31,7 +31,7 @@ jobs:
     
     - uses: Azure/k8s-create-secret@v1
       with:
-        container-registry-url: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io
+        container-registry-url: myacrevivek1.azurecr.io
         container-registry-username: ${{ secrets.USERNAME }}
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         secret-name: demo-k8s-secret
